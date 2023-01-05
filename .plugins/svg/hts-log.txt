@@ -1,0 +1,46 @@
+HTTrack3.48-22 launched on Tue, 14 Jan 2020 23:43:29 at https://aydos.com/svgedit +*.png +*.gif +*.jpg +*.jpeg +*.css +*.js -ad.doubleclick.net/*
+(webhttrack -q -%i -w https://aydos.com/svgedit -O "/var/www/html/wiki/.plugins/svgpath/SVGpath" -n -%P -N0 -s2 -p7 -D -a -K0 -c4 -%k -A25000 -F "Mozilla/4.5 (compatible; HTTrack 3.0x; Windows 98)" -%F "<!-- Mirrored from %s%s by HTTrack Website Copier/3.x [XR&CO'2014], %s -->" +*.png +*.gif +*.jpg +*.jpeg +*.css +*.js -ad.doubleclick.net/* -%s -%u )
+
+Information, Warnings and Errors reported for this mirror:
+note:	the hts-log.txt file, and hts-cache folder, may contain sensitive information,
+	such as username/password authentication for websites mirrored in this project
+	do not share these files/folders if you want these information to remain private
+
+23:44:26	Warning: 	file not stored in cache due to bogus state (broken size, expected 8389 got 33): https://aydos.com/img/aydos1.jpg
+23:44:26	Warning: 	file not stored in cache due to bogus state (broken size, expected 3678 got 1853): https://aydos.com/img/applications/vocabularytest.png
+23:44:27	Warning: 	file not stored in cache due to bogus state (broken size, expected 4822 got 2425): https://aydos.com/img/applications/flashcards.png
+23:44:27	Warning: 	file not stored in cache due to bogus state (broken size, expected 5547 got 2774): https://aydos.com/img/applications/cloudywords.png
+23:44:27	Warning: 	file not stored in cache due to bogus state (broken size, expected 5738 got 2883): https://aydos.com/img/applications/speedreading.png
+23:44:28	Warning: 	file not stored in cache due to bogus state (broken size, expected 23220 got 11624): https://aydos.com/img/applications/wormhole.png
+23:44:28	Error: 	Exit requested by shell or user
+23:44:28	Warning: 	file not stored in cache due to bogus state (broken size, expected 2712 got 1370): https://aydos.com/img/applications/primes.png
+23:44:29	Warning: 	File not added due to mirror cancel: https://aydos.com/vocabularytest/
+23:44:29	Error: 	"mirror stopped by user" (-1) at link https://aydos.com/vocabularytest/ (from https://aydos.com/)
+23:44:29	Warning: 	File not added due to mirror cancel: https://aydos.com/flashcards/
+23:44:29	Error: 	"mirror stopped by user" (-1) at link https://aydos.com/flashcards/ (from https://aydos.com/)
+23:44:29	Warning: 	File not added due to mirror cancel: https://aydos.com/cloudywords/
+23:44:29	Error: 	"mirror stopped by user" (-1) at link https://aydos.com/cloudywords/ (from https://aydos.com/)
+23:44:29	Warning: 	File not added due to mirror cancel: https://aydos.com/hizliokuma/
+23:44:29	Error: 	"mirror stopped by user" (-1) at link https://aydos.com/hizliokuma/ (from https://aydos.com/)
+23:44:29	Warning: 	File not added due to mirror cancel: https://aydos.com/speedreading/
+23:44:29	Error: 	"mirror stopped by user" (-1) at link https://aydos.com/speedreading/ (from https://aydos.com/)
+23:44:29	Warning: 	File not added due to mirror cancel: https://aydos.com/primes/
+23:44:29	Error: 	"mirror stopped by user" (-1) at link https://aydos.com/primes/ (from https://aydos.com/)
+23:44:29	Warning: 	File not added due to mirror cancel: https://aydos.com/pi/
+23:44:29	Error: 	"mirror stopped by user" (-1) at link https://aydos.com/pi/ (from https://aydos.com/)
+23:44:29	Warning: 	File not added due to mirror cancel: https://aydos.com/brainwaves/
+23:44:29	Error: 	"mirror stopped by user" (-1) at link https://aydos.com/brainwaves/ (from https://aydos.com/)
+23:44:29	Warning: 	File not added due to mirror cancel: https://aydos.com/bayrak/
+23:44:29	Error: 	"mirror stopped by user" (-1) at link https://aydos.com/bayrak/ (from https://aydos.com/)
+23:44:29	Warning: 	File not added due to mirror cancel: https://aydos.com/turkiye/
+23:44:29	Error: 	"mirror stopped by user" (-1) at link https://aydos.com/turkiye/ (from https://aydos.com/)
+23:44:29	Warning: 	File not added due to mirror cancel: https://aydos.com/fcm/
+23:44:29	Error: 	"mirror stopped by user" (-1) at link https://aydos.com/fcm/ (from https://aydos.com/)
+23:44:29	Warning: 	File not added due to mirror cancel: https://aydos.com/fnf/
+23:44:29	Error: 	"mirror stopped by user" (-1) at link https://aydos.com/fnf/ (from https://aydos.com/)
+23:44:29	Error: 	"Not Found" (404) at link https://aydos.com/js/vocabularies.js (from https://aydos.com/vocabularytest/)
+23:44:29	Warning: 	File not added due to mirror cancel: www.assoc-amazon.com/e/ir?t=aydos09&l=as2&o=1&a=0380715775
+23:44:29	Error: 	"mirror stopped by user" (-1) at link www.assoc-amazon.com/e/ir?t=aydos09&l=as2&o=1&a=0380715775 (from https://aydos.com/speedreading/)
+
+HTTrack Website Copier/3.48-22 mirror complete in 1 minutes 0 seconds : 76 links scanned, 73 files written (674269 bytes overall) [511148 bytes received at 8519 bytes/sec], 520551 bytes transferred using HTTP compression in 80 files, ratio 62%
+(15 errors, 20 warnings, 0 messages)

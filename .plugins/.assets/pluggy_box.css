@@ -1,0 +1,567 @@
+
+/******
+
+		## pluggy_box styles::
+
+*******/
+
+
+
+.tc-tag-list-item {
+	position: static;
+}
+
+.tc-tag-list-item .tc-drop-down {
+	left: 5px !important;
+}
+#pluggy_box .tc-tag-list-item .tc-drop-down {
+        margin-top: 60px;
+}
+.tc-sidebar-header > .tc-reveal {
+	width: calc(100% - 45px);
+}
+
+.tc-notification {
+	z-index: 20001 !important;
+}
+
+/* --- Sidebar tag cloud fix --  */
+
+.tc-sidebar-header .tc-sidebar-lists p {
+	display: inline-block;
+}
+.tc-sidebar-header .tc-sidebar-lists .tc-reveal p:nth-child(1) {
+	display: block;
+	margin-bottom: 12px;
+}
+
+
+#pluggy_box_sidebar {
+	position: fixed;
+    top: 45px;
+    right: 2px;
+    width: 96px;
+	min-height: 75px;
+    max-height: calc(100% - 55px);
+    overflow-y: scroll;
+    overflow-x: hidden;
+    text-align: center;
+    background: #ececec;
+    border: solid 1px #bbb;
+    border-radius: 6px 0px 0px 6px;
+    z-index: 20000;
+}
+#pluggy_box_sidebar:hover {
+    padding-bottom: 60px;
+}
+#pluggy_box_sidebar #pluggy_box_sidebar_menu {
+	position: absolute;
+	top: 72px;
+	width: 100%;
+	height: 25px;
+	display: none;
+}
+#pluggy_box_sidebar:hover #pluggy_box_sidebar_menu {
+	display: block;
+}
+#pluggy_box_sidebar_menu > div {
+	float: left;
+	height: 100%;
+	width: 50%;
+	margin: 0;
+	padding: 0;
+	padding-top: 3px;
+	font-size: 23px;
+    white-space: pre;
+	color: #fff;
+	font-weight: 600;
+	cursor: pointer;
+}
+#pluggy_box_sidebar_menu > div:hover {
+	color: #5e5e5e;
+}
+#pluggy_box_sidebar_menu > div:after {
+    display: block;
+	position: absolute;
+	top: -18px;
+	left: 2px;
+	width: 200%;
+	text-align: left;
+	font-size: 14px;
+	font-weight: 600;
+}
+#pluggy_box_plugins_fullpage:hover:after {
+	content: 'expand';
+}
+#pluggy_box_stated_plugin_kill:hover:after {
+	content: 'kill active';
+}
+#pluggy_box_plugins_fullpage {
+	background: rgb(0,143,255);
+}
+#pluggy_box_stated_plugin_kill {
+	background: rgb(255,79,0);
+}
+
+
+#pluggy_box_sidebar .pluggy_box_button {
+    display: inline-block;
+    position: relative;
+    top: 44px;
+    left: 0px;
+    padding: 5px;
+    margin: 10px 5px 1px 6px !important;
+    border: solid 1px #5e5e5e;
+    border-radius: 4px;
+    background: #fff;
+    cursor: pointer;
+    display: none;
+}
+#pluggy_box_sidebar.state {
+	padding-top: 52px;
+}
+#pluggy_box_sidebar .pluggy_box_button.state {
+	display: inline-block;
+	position: absolute;
+	top: 9px;
+	left: 14px;
+	border-color: #EECC66;
+    border-width: 2px;
+    margin-left: -1px;
+	margin-top: 8px;
+}
+#pluggy_box_sidebar .pluggy_box_button:hover, #pluggy_box_sidebar .pluggy_box_button.current {
+	background: #5e5e5e;
+}
+
+#pluggy_box_sidebar .pluggy_box_button.state + div {
+	margin-top: 7px;
+}
+#pluggy_box_sidebar .pluggy_box_button svg {
+	display: block;
+	width: 24px;
+}
+#pluggy_box_sidebar .pluggy_box_button:hover svg, #pluggy_box_sidebar .pluggy_box_button.current svg {
+	fill: #fff;
+}
+
+#pluggy_box_panel {
+	position: fixed;
+	top: 0px;
+	left: 0px;
+	height: 100%;
+	width: 0px;
+	overflow: hidden;
+	background: #ff000080;
+	z-index: 9998;
+}
+#pluggy_box_panel.active {
+	width: 100%;
+}
+
+#pluggy_box_panel > iframe {
+	padding: 0 !important;
+	margin: 0 !important;
+	height: 100%;
+	width: 100%;
+	border: none !important;
+	outline: none !important;
+	box-shadow: none !important;
+	background: #fff;
+}
+#pluggy_box_panel.active + body {
+	overflow: hidden;
+}
+
+
+#pluggy_box_panel.active #pluggy_box_frame_close {
+    font-family: Arial;
+    position: fixed;
+    bottom: 8px;
+    left: 0px;
+    width: 25px;
+    height: 24px;
+    padding-right: 0px;
+    padding-top: 2px;
+    background: red;
+    color: #fff;
+    font-weight: bold;
+    font-size: 17px;
+    text-align: center;
+    border-radius: 0 4px 0 0;
+    cursor: pointer;
+    z-index: 9999;
+}
+
+#pluggy_box_panel.active #pluggy_box_frame_close:hover {
+	padding: 2px !important;
+	bottom: 6px;
+	width: 29px;
+	height: 27px;
+	font-size: 20px;
+}
+
+#pluggy_box_frame_close:hover + iframe {
+	outline: solid 3px red !important;
+	width: calc(100% - 6px);
+	height: calc(100% - 6px);
+	margin-top: 3px !important;
+	margin-left: 3px !important;
+	opacity: 0.65;
+}
+
+#pluggy_box_sidebar:hover .pluggy_box_button {
+	display: inline-block !important;
+}
+
+
+
+#pluggy_box_sidebar .pluggy_box_button:nth-of-type(1), #pluggy_box_sidebar.state .pluggy_box_button:nth-of-type(1).state {
+	top: 10px;
+	margin-top: 0;
+}
+#pluggy_box_sidebar.state .pluggy_box_button:nth-of-type(1) {
+	top: 46px;
+}
+
+#pluggy_box_sidebar .pluggy_box_button.state, #pluggy_box_sidebar .pluggy_box_button:nth-of-type(1)  {
+	display: inline-block;
+}
+#pluggy_box_sidebar.state .pluggy_box_button:nth-of-type(1) {
+	display: none;
+}
+#pluggy_box_sidebar.state .pluggy_box_button:nth-of-type(1).state {
+	display: inline-block;
+}
+
+
+
+
+#date_time path {
+	transform: scale(0.05);
+}
+
+#sitemap_generator path {
+	transform: scale(0.05);
+}
+
+#kanban path {
+	transform: scale(0.045);
+}
+
+
+#php_info svg path {
+	transform: scale(1.5);
+}
+
+#rss svg path {
+    transform: scale(0.036);
+}
+
+
+#mr-data_converter svg path {
+    transform: scale(0.037);
+}
+
+#admin svg path {
+    transform: scale(0.045);
+}
+
+#stonks svg path {
+	transform: scale(0.05);
+}
+
+#mail svg path {
+    transform: scale(0.045);
+}
+
+#text_cool svg path {
+    transform: scale(1.5) translateY(-1px);
+}
+
+#php_proxy svg path {
+    transform: scale(1.5) translateY(-1px);
+}
+
+#svg svg path {
+    transform: scale(0.045);
+}
+
+#calc svg path {
+    transform: scale(1.6) translateY(-1px);
+}
+
+#sandbox svg path {
+    transform: scale(1.2) translateY(2px);
+}
+
+#downloader svg path {
+    transform: scale(1.5) translateY(-1px);
+}
+
+#php_proxy svg path {
+    transform: scale(1.5) translateY(-1px);
+}
+
+#mini_paint svg path {
+    transform: scale(1.5) translateY(-1px);
+}
+
+#spf_toolbox svg path {
+    transform: scale(1.475) translateY(0.5px);
+}
+
+#data svg path {
+    transform: scale(1.5) translateY(-1px);
+}
+
+#p0wny_shell svg path {
+    transform: scale(1.5);
+}
+
+#maybes svg path {
+	transform: scale(0.046) translateY(2px);
+}
+
+#adminer svg path {
+    transform: scale(1.45);
+}
+
+#webshell svg path {
+    transform: scale(1.5);
+}
+
+#notes svg path {
+    transform: scale(0.045) translateX(25px);
+}
+#media_player svg path {
+	transform: scale(0.07) translateX(-90px) translateY(-75px);
+}
+#games svg path {
+    transform: scale(1.45);
+}
+#mysql_backup svg path {
+    transform: scale(0.045);
+}
+#equations svg path {
+    transform: scale(1.75);
+}
+
+.pluggy_box_button:after {
+	content: attr(id);
+	position: absolute;
+	top: 95%;
+	padding: 0px 2px;
+	left: -13px;
+	text-align: center;
+	min-width: calc(70% + 26px);
+	max-width: calc(100% + 26px);
+    white-space: pre;
+	font-size: 10px;
+	font-weight: bold;
+	color: #333;
+	background: rgba(255,255,255,0.7);
+	outline: solid 1px rgba(177,175,175,0.77);
+	display: none;
+	z-index: 21000;
+}
+.pluggy_box_button:hover:after {
+	display: block;
+}
+
+
+/* ./plugins index.php styles:: */
+
+
+
+
+.pluggy_box_page {
+	text-align: center;
+	padding-bottom: 30px;
+}
+
+
+#pluggy_box_page .pluggy_box_button {
+	position: relative;
+}
+.pluggy_box_page .pluggy_box_button {
+	display: inline-block;
+	min-height: 130px;
+	max-height: 130px;
+	min-width: 130px;
+	max-width: 130px;
+	margin: 16px;
+	border: solid 1px #999;
+	border-radius: 3px;
+	cursor: pointer;
+}
+.pluggy_box_page .pluggy_box_button > svg {
+	margin: 5%;
+	height: 90%;
+	width: 90%;
+	pointer-events: none;
+}
+.pluggy_box_page .pluggy_box_button:after {
+	top: calc(100% + 1px);
+	left: 0px;
+	width: 100%;
+	padding: 0px;
+	font-size: 12px;
+}
+
+.pluggy_box_page #pluggy_box_page {
+	-webkit-columns: 3;
+	   -moz-columns: 3;
+			columns: 3;
+	 -webkit-column-gap: 32px;
+    	-moz-column-gap: 32px;
+         	 column-gap: 32px;
+}
+
+
+@media only screen and (max-width: 1160px) {
+	.pluggy_box_page #pluggy_box_page {
+		-webkit-columns: 2;
+		   -moz-columns: 2;
+				columns: 2;
+	}
+	.pluggy_box_page .pluggy_box_button {
+		margin: 16px 12px;
+	}
+
+}
+
+@media only screen and (max-width: 720px) {
+	.pluggy_box_page #pluggy_box_page {
+		-webkit-columns: 3;
+		   -moz-columns: 3;
+				columns: 3;
+	}
+
+}
+
+
+.pluggy_box_page #date_time path {
+	transform: scale(0.225);
+}
+
+.pluggy_box_page #upload_button path {
+	transform: scale(5);
+}
+
+.pluggy_box_page #search_replace_button path {
+	transform: scale(4.75);
+}
+
+.pluggy_box_page #sitemap_generator path {
+	transform: scale(0.2425);
+}
+
+.pluggy_box_page #kanban path {
+	transform: scale(0.228);
+}
+
+
+.pluggy_box_page #php_info svg path {
+	transform: scale(7.225) translateX(0.25px);
+}
+
+.pluggy_box_page #rss svg path {
+    transform: scale(0.18);
+}
+
+.pluggy_box_page #mr-data_converter svg path {
+    transform: scale(0.18);
+}
+
+.pluggy_box_page #admin svg path {
+    transform: scale(0.2275);
+}
+
+.pluggy_box_page #stonks svg path {
+	transform: scale(0.24);
+}
+
+.pluggy_box_page #mail svg path {
+    transform: scale(0.2275);
+}
+
+.pluggy_box_page #text_cool svg path {
+    transform: scale(7.25) translateY(-1px);
+}
+
+.pluggy_box_page #php_proxy svg path {
+    transform: scale(7.8) translateY(-1px);
+}
+
+.pluggy_box_page #svg svg path {
+    transform: scale(0.2275);
+}
+
+.pluggy_box_page #calc svg path {
+    transform: scale(7.8) translateY(-1px);
+}
+
+.pluggy_box_page #sandbox svg path {
+    transform: scale(6) translateY(2px);
+}
+
+.pluggy_box_page #js2php path {
+	transform: scale(4.8);
+}
+
+.pluggy_box_page #php_sandbox path {
+	transform: scale(5);
+}
+
+.pluggy_box_page #downloader svg path {
+    transform: scale(7.25) translateY(-1px);
+}
+
+.pluggy_box_page #mini_paint svg path {
+    transform: scale(7.25);
+}
+
+.pluggy_box_page #spf_toolbox svg path {
+    transform: scale(7.275);
+}
+
+.pluggy_box_page #data svg path {
+    transform: scale(7.25);
+}
+
+.pluggy_box_page #p0wny_shell svg path {
+    transform: scale(7.25);
+}
+
+.pluggy_box_page #maybes svg path {
+	transform: scale(0.2285);
+}
+
+.pluggy_box_page #adminer svg path {
+    transform: scale(7.3);
+}
+
+.pluggy_box_page #webshell svg path {
+    transform: scale(7.25);
+}
+
+.pluggy_box_page #notes svg path {
+    transform: scale(0.225) translateX(20px);
+}
+
+.pluggy_box_page #games svg path {
+    transform: scale(7.25);
+}
+
+
+.pluggy_box_page #media_player svg path {
+    transform: scale(0.255) translateY(-25px) translateX(-25px);
+}
+.pluggy_box_page #mysql_backup svg path {
+    transform: scale(0.23);
+}
+
+.pluggy_box_page #equations  svg path {
+    transform: scale(8.25);
+}

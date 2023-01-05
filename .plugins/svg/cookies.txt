@@ -1,0 +1,7 @@
+# HTTrack Website Copier Cookie File
+# This file format is compatible with Netscape cookies
+.mathjax.org	TRUE	/	FALSE	1999999999	__cfduid	d7dbd228cdb523c58ff7c74c8eea0680d1579074259
+cdn.mathjax.org	TRUE	/	FALSE	1999999999	SameSite	Lax
+.d3js.org	TRUE	/	FALSE	1999999999	__cfduid	d1a8fcac3970ba3c271aa6080f1f568fa1579074261
+d3js.org	TRUE	/	FALSE	1999999999	SameSite	Lax
+
