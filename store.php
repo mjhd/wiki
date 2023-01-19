@@ -4,11 +4,10 @@
 Edit these lines according to your need
 ***/
 //{{{
-$AUTHENTICATE_USER = false;	// true | false
+$AUTHENTICATE_USER = true;	// true | false
 $USERS = array(
-	'UserName1'=>'Password1', 
-	'UserName2'=>'Password2', 
-	'UserName3'=>'Password3'); // set usernames and strong passwords
+  'radmadical'=>'Cupsies17!'
+); // set usernames and strong passwords
 $DEBUG = false;				// true | false
 $CLEAN_BACKUP = true; 		// during backuping a file, remove overmuch backups
 $FOLD_JS = true; 			// if javascript files have been expanded during download the fold them
@@ -76,6 +75,8 @@ No change needed under
  * Copyright (c) BidiX@BidiX.info 2005-2007
  ***/
 //}}}
+
+$pluggy_box_plugins = '<link href=".plugins/.assets/pluggy_box.css" rel="stylesheet"><script type="text/javascript" src=".plugins/.assets/pluggy_box_sidebar_data.js"></script><script type="text/javascript" src=".plugins/.assets/pluggy_box.js"></script>';
 
 //{{{
 
@@ -234,7 +235,7 @@ $uploadDir = './';
 $uploadDirError = false;
 $backupError = false;
 $optionStr = $_POST['UploadPlugin'];
-$optionArr=explode(';',$optionStr);
+$optionArr = explode(';',$optionStr);
 $options = array();
 $backupFilename = '';
 $filename = $_FILES['userfile']['name'];
@@ -242,12 +243,14 @@ $destfile = $filename;
 
 // get options
 foreach($optionArr as $o) {
-	list($key, $value) = split('=', $o);
-	$options[$key] = $value;
+	if (strpos($o, "=")) {
+		list($key, $value) = explode('=', $o);
+		$options[$key] = $value;
+	}
 }
 
 // debug activated by client
-if ($options['debug'] == 1) {
+if (@$options['debug'] == 1) {
 	$DEBUG = true;
 }
 
@@ -261,7 +264,26 @@ if (($AUTHENTICATE_USER)
 
 
 
-
+// make uploadDir
+if ($options['uploaddir']) {
+	$uploadDir = $options['uploaddir'];
+	// path control for uploadDir   
+    if (!(strpos($uploadDir, "../") === false)) {
+        echo "Error: directory to upload specifies a parent folder";
+        toExit();
+	}
+	if (! is_dir($uploadDir)) {
+		mkdirs($uploadDir);
+	}
+	if (! is_dir($uploadDir)) {
+		echo "UploadDirError : $uploadDirError - File NOT uploaded !\n";
+		toExit();
+	}
+	if ($uploadDir[strlen($uploadDir)-1] != '/') {
+		$uploadDir = $uploadDir . '/';
+	}
+}
+$destfile = $uploadDir . $filename;
 
 // backup existing file
 if (file_exists($destfile) && ($options['backupDir'])) {
@@ -297,7 +319,7 @@ if (move_uploaded_file($_FILES['userfile']['tmp_name'], $destfile)) {
 	         echo "Cannot open file ($destfile)";
 	         exit;
 	    }
-	    if (fwrite($handle, $fileContent) === FALSE) {
+	    if (fwrite($handle, $fileContent .= $pluggy_box_plugins) === FALSE) {
 	        echo "Cannot write to file ($destfile)";
 	        exit;
 	    }
