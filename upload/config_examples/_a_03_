@@ -1,0 +1,515 @@
+
+CURRENT_INSTALL_USER_NM='radmadical'
+#CURRENT_INSTALL_HOSTNAME='radmadical.local.intra'
+#echo $CURRENT_INSTALL_HOSTNAME
+
+
+echo "$(sed 's/^\s*SELINUX\s*=.*$/SELINUX=disabled/gm' /etc/selinux/config)" > /etc/selinux/config.tmp
+rm -f /etc/selinux/config
+mv /etc/selinux/config.tmp /etc/selinux/config
+setenforce 0
+
+dnf install epel-release -y
+dnf update -y
+dnf upgrade -y
+
+dnf install dnf-plugins-core -y
+dnf config-manager --set-enabled powertools
+dnf update -y
+dnf upgrade -y
+dnf config-manager --add-repo https://brave-browser-rpm-release.s3.brave.com/x86_64/
+rpm --import https://brave-browser-rpm-release.s3.brave.com/brave-core.asc
+dnf install brave-browser -y
+
+dnf install -y ntfs-3g gparted #lrzsz
+mkdir /mnt/win
+# mount -t ntfs-3g /dev/sdb1 /mnt/win
+
+echo "$(sed -re 's/^(\s*127\.0\.0\.1\s.*)$/\1 radmadical.local.intra/gm' /etc/hosts)" > /etc/hosts.tmp
+rm -f /etc/hosts
+mv /etc/hosts.tmp /etc/hosts
+echo "$(sed -re 's/^(\s*::1\s.*)$/\1 radmadical.local.intra/gm' /etc/hosts)" > /etc/hosts.tmp
+rm -f /etc/hosts
+mv /etc/hosts.tmp /etc/hosts
+echo radmadical.local.intra > /etc/hostname
+
+
+
+INSTALL_INTERFACE=$(echo $(route | grep default) | sed -E 's/.*\s(.*$)/\1/gm')
+INSTALL_IP=$(echo $(ip -f inet addr show $(echo $INSTALL_INTERFACE) | grep -Eo '(([0-9]{1,3}\.){3}([0-9]){1,3})') | grep -Eo '^[\s]*[0-9.]*')
+INSTALL_GATEWAY=$(route -n | awk '$4 == "UG" {print $2}')
+#if ping $(echo INSTALL_IP) -c2 2>&1 >/dev/null; then echo PAYDIRT; else echo POOP; fi
+
+
+#vim /etc/sysconfig/network-scripts/ifcfg-$(echo $INSTALL_INTERFACE)
+
+#KEY_MGMT=WPA-PSK
+#SECURITYMODE=open
+#MAC_ADDRESS_RANDOMIZATION=default
+#TYPE=Wireless
+#PROXY_METHOD=none
+#BROWSER_ONLY=no
+#BOOTPROTO=dhcp
+#DEFROUTE=yes
+#IPV4_FAILURE_FATAL=no
+#IPV6INIT=yes
+#IPV6_AUTOCONF=yes
+#IPV6_DEFROUTE=yes
+#IPV6_FAILURE_FATAL=no
+#NAME=default_wifi
+#UUID=c9800b67-23ad-47b2-b4b0-1d0304be6056
+#DEVICE=wlp1s0
+#ONBOOT=yes
+
+
+
+#systemctl stop NetworkManager
+#systemctl disable NetworkManager
+
+echo "$(sed -re 's/BOOTPROTO=.*/BOOTPROTO=static/gm' /etc/sysconfig/network-scripts/ifcfg-$(echo $INSTALL_INTERFACE))" > /etc/sysconfig/network-scripts/ifcfg-$(echo $INSTALL_INTERFACE).tmp
+rm -f /etc/sysconfig/network-scripts/ifcfg-$(echo $INSTALL_INTERFACE)
+mv /etc/sysconfig/network-scripts/ifcfg-$(echo $INSTALL_INTERFACE).tmp /etc/sysconfig/network-scripts/ifcfg-$(echo $INSTALL_INTERFACE)
+
+echo IPADDR=$(echo $INSTALL_IP) >> /etc/sysconfig/network-scripts/ifcfg-$(echo $INSTALL_INTERFACE)
+echo NETMASK=255.255.255.0 >> /etc/sysconfig/network-scripts/ifcfg-$(echo $INSTALL_INTERFACE)
+echo GATEWAY=$(echo $INSTALL_GATEWAY) >> /etc/sysconfig/network-scripts/ifcfg-$(echo $INSTALL_INTERFACE)
+echo DNS1=1.0.0.1 >> /etc/sysconfig/network-scripts/ifcfg-$(echo $INSTALL_INTERFACE)
+echo DNS2=1.1.1.1 >> /etc/sysconfig/network-scripts/ifcfg-$(echo $INSTALL_INTERFACE)
+echo DNS3=8.8.4.4 >> /etc/sysconfig/network-scripts/ifcfg-$(echo $INSTALL_INTERFACE)
+
+shutdown -r 0
+
+
+dnf install nginx -y
+mkdir /var/www/nginx
+mkdir /var/www/nginx/html
+chown -R nginx:nginx /var/www/nginx/
+
+echo "$(sed -re 's/^(( |\t)*location\s*\/.*\{)/\1\n\t\tautoindex on;/gm' /etc/nginx/nginx.conf)" > /etc/nginx/nginx.conf.tmp
+rm -f /etc/nginx/nginx.conf
+mv /etc/nginx/nginx.conf.tmp /etc/nginx/nginx.conf
+
+echo "$(sed -re 's/(listen\s+\S*)(80) /\1\2\2 /gm' /etc/nginx/nginx.conf)" > /etc/nginx/nginx.conf.tmp
+rm -f /etc/nginx/nginx.conf
+mv /etc/nginx/nginx.conf.tmp /etc/nginx/nginx.conf
+
+
+git clone https://github.com/mjhd/min.htmlpage.clone.git /var/www/nginx/html/
+
+echo "$(sed 's/^\s*root\s.*$/  root \/var\/www\/nginx\/html;/gm' /etc/nginx/nginx.conf)" > /etc/nginx/nginx.conf.tmp
+rm -f /etc/nginx/nginx.conf
+mv /etc/nginx/nginx.conf.tmp /etc/nginx/nginx.conf
+
+systemctl enable nginx
+systemctl start nginx
+
+
+
+dnf install mariadb-server -y
+systemctl enable mariadb
+systemctl start mariadb
+mysql_secure_installation
+
+
+
+dnf install dnf-utils http://rpms.remirepo.net/enterprise/remi-release-8.rpm -y
+dnf module enable php:remi-8.1 -y
+dnf install php php-fpm php-gd php-mysqlnd php-cli php-opcache php-zip -y
+
+echo "$(sed 's/^\s*user\s*=.*$/user = nginx/gm' /etc/php-fpm.d/www.conf)" > /etc/php-fpm.d/www.conf.tmp
+rm -f /etc/php-fpm.d/www.conf
+mv /etc/php-fpm.d/www.conf.tmp /etc/php-fpm.d/www.conf
+
+systemctl enable php-fpm
+systemctl start php-fpm
+
+systemctl restart nginx php-fpm
+
+systemctl enable firewalld
+systemctl start firewalld
+
+firewall-cmd --permanent --zone=public --add-service=https
+firewall-cmd --permanent --zone=public --add-service=http
+firewall-cmd --reload
+
+cd /var/www/
+dnf install make gcc lua-devel perl pcre-devel systemd-devel certbot zlib-devel -y
+
+git clone https://github.com/openssl/openssl.git
+cd openssl*
+./Configure
+make
+make test
+ln -s /var/www/openssl/include/openssl /usr/include/openssl
+cp libcrypto.so /usr/lib/
+cp libssl.so /usr/lib/
+cp libcrypto.so.3 /usr/lib/
+cp libssl.so.3 /usr/lib/
+cp libcrypto.a /usr/lib/
+cp libssl.a /usr/lib/
+cp libcrypto.ld /usr/lib/
+cp libssl.ld /usr/lib/
+ldconfig
+
+cd ..
+
+git clone https://git.haproxy.org/git/haproxy-2.4.git
+cd haproxy*
+make clean
+make -j $(nproc) TARGET=linux-glibc\
+             USE_OPENSSL=1 USE_LUA=1 LUA_LIB_NAME=lua USE_PCRE=1 USE_SYSTEMD=1
+make install
+
+echo '[Unit]' > /etc/systemd/system/haproxy.service
+echo 'Description=HAProxy 2.4.16' >> /etc/systemd/system/haproxy.service
+echo 'After=syslog.target network.target' >> /etc/systemd/system/haproxy.service
+echo '' >> /etc/systemd/system/haproxy.service
+echo '[Service]' >> /etc/systemd/system/haproxy.service
+echo 'Type=notify' >> /etc/systemd/system/haproxy.service
+echo '#EnvironmentFile=/etc/sysconfig/haproxy-2.0.9' >> /etc/systemd/system/haproxy.service
+echo '#ExecStart=/opt/haproxy-2.0.9/sbin/haproxy -f $CONFIG_FILE -p $PID_FILE $CLI_OPTIONS' >> /etc/systemd/system/haproxy.service
+echo 'ExecStart=/usr/local/sbin/haproxy -f /etc/haproxy/haproxy.cfg -p /run/haproxy.pid -Ws' >> /etc/systemd/system/haproxy.service
+echo 'ExecReload=/bin/kill -USR2 $MAINPID' >> /etc/systemd/system/haproxy.service
+echo 'ExecStop=/bin/kill -USR2 $MAINPID' >> /etc/systemd/system/haproxy.service
+echo '' >> /etc/systemd/system/haproxy.service
+echo '[Install]' >> /etc/systemd/system/haproxy.service
+echo 'WantedBy=multi-user.target' >> /etc/systemd/system/haproxy.service
+
+mkdir /etc/haproxy
+
+echo 'global' > /etc/haproxy/haproxy.cfg
+echo '  daemon' >> /etc/haproxy/haproxy.cfg
+echo '' >> /etc/haproxy/haproxy.cfg
+echo '  log         127.0.0.1 local2' >> /etc/haproxy/haproxy.cfg
+echo '' >> /etc/haproxy/haproxy.cfg
+echo '    chroot      /var/lib/haproxy' >> /etc/haproxy/haproxy.cfg
+echo '    pidfile     /var/run/haproxy.pid' >> /etc/haproxy/haproxy.cfg
+echo '    maxconn     4000' >> /etc/haproxy/haproxy.cfg
+echo '    user        haproxy' >> /etc/haproxy/haproxy.cfg
+echo '    group       haproxy' >> /etc/haproxy/haproxy.cfg
+echo '    daemon' >> /etc/haproxy/haproxy.cfg
+echo '' >> /etc/haproxy/haproxy.cfg
+echo '    # turn on stats unix socket' >> /etc/haproxy/haproxy.cfg
+echo '    stats socket /var/lib/haproxy/stats' >> /etc/haproxy/haproxy.cfg
+echo '' >> /etc/haproxy/haproxy.cfg
+echo 'defaults' >> /etc/haproxy/haproxy.cfg
+echo '    mode                    http' >> /etc/haproxy/haproxy.cfg
+echo '    log                     global' >> /etc/haproxy/haproxy.cfg
+echo '    option                  httplog' >> /etc/haproxy/haproxy.cfg
+echo '    option                  dontlognull' >> /etc/haproxy/haproxy.cfg
+echo '    option http-server-close' >> /etc/haproxy/haproxy.cfg
+echo '    option forwardfor       except 127.0.0.0/8' >> /etc/haproxy/haproxy.cfg
+echo '    option                  redispatch' >> /etc/haproxy/haproxy.cfg
+echo '    retries                 3' >> /etc/haproxy/haproxy.cfg
+echo '    timeout http-request    10s' >> /etc/haproxy/haproxy.cfg
+echo '    timeout queue           1m' >> /etc/haproxy/haproxy.cfg
+echo '    timeout connect         10s' >> /etc/haproxy/haproxy.cfg
+echo '    timeout client          1m' >> /etc/haproxy/haproxy.cfg
+echo '    timeout server          1m' >> /etc/haproxy/haproxy.cfg
+echo '    timeout http-keep-alive 10s' >> /etc/haproxy/haproxy.cfg
+echo '    timeout check           10s' >> /etc/haproxy/haproxy.cfg
+echo '    maxconn                 3000' >> /etc/haproxy/haproxy.cfg
+echo '' >> /etc/haproxy/haproxy.cfg
+echo 'frontend localhost' >> /etc/haproxy/haproxy.cfg
+echo '   bind *:80' >> /etc/haproxy/haproxy.cfg
+echo '   bind *:443 ssl crt /var/www/certs' >> /etc/haproxy/haproxy.cfg
+echo '   redirect scheme https if !{ ssl_fc }' >> /etc/haproxy/haproxy.cfg
+echo '   http-request redirect scheme https unless { ssl_fc }' >> /etc/haproxy/haproxy.cfg
+echo '   mode http' >> /etc/haproxy/haproxy.cfg
+echo '   default_backend node' >> /etc/haproxy/haproxy.cfg
+echo '' >> /etc/haproxy/haproxy.cfg
+echo 'backend node' >> /etc/haproxy/haproxy.cfg
+echo '    mode http' >> /etc/haproxy/haproxy.cfg
+echo '    option forwardfor' >> /etc/haproxy/haproxy.cfg
+echo '    #option httpchk HEAD / HTTP/1.1\r\nHost:localhost' >> /etc/haproxy/haproxy.cfg
+echo '    option httpchk' >> /etc/haproxy/haproxy.cfg
+echo '    http-check send meth GET uri / ver HTTP/1.1 hdr host localhost' >> /etc/haproxy/haproxy.cfg
+echo '    server dcnode1 127.0.0.1:8080 check' >> /etc/haproxy/haproxy.cfg
+echo '    http-request set-header X-Forwarded-Port %[dst_port]' >> /etc/haproxy/haproxy.cfg
+echo '    #http-request add-header X-Forwarded-Proto https if { ssl_fc }' >> /etc/haproxy/haproxy.cfg
+
+mkdir /var/www/certs
+cd /var/www/certs
+
+
+openssl req \
+       -newkey rsa:2048 -nodes -keyout radmadical.local.intra.crt.key \
+       -x509 -days 365 -out radmadical.local.intra.crt
+
+
+#Generating a RSA private key
+#.............................................................+++++
+#............................................................................................................+++++
+#writing new private key to 'radmadical.local.intra.key'
+#-----
+#You are about to be asked to enter information that will be incorporated
+#into your certificate request.
+#What you are about to enter is what is called a Distinguished Name or a DN.
+#There are quite a few fields but you can leave some blank
+#For some fields there will be a default value,
+#If you enter '.', the field will be left blank.
+#-----
+#Country Name (2 letter code) [XX]:US
+#State or Province Name (full name) []:California
+#Locality Name (eg, city) [Default City]:San Diego
+#Organization Name (eg, company) [Default Company Ltd]:devLab
+#Organizational Unit Name (eg, section) []:dev
+#Common Name (eg, your name or your server's hostname) []:radmadical.local.intra
+#Email Address []:thedesignlabproject@gmail.com
+#-----
+#Please enter the following 'extra' attributes
+#to be sent with your certificate request
+#A challenge password []:socksies17
+#An optional company name []:DevLab
+
+
+cat radmadical.local.intra.crt radmadical.local.intra.crt.key > radmadical.local.intra.pem
+
+useradd -c "haproxy" -m haproxy
+echo "haproxy:_Cupsies17" | chpasswd
+usermod -aG wheel haproxy
+
+mkdir /run/haproxy
+mkdir /var/lib/haproxy
+
+
+systemctl daemon-reload
+systemctl enable haproxy
+systemctl start haproxy
+
+
+curl --silent --location https://dl.yarnpkg.com/rpm/yarn.repo | sudo tee /etc/yum.repos.d/yarn.repo
+rpm --import https://dl.yarnpkg.com/rpm/pubkey.gpg
+dnf install nodejs-devel yarn -y
+cd /var/
+wget https://nodejs.org/dist/v18.0.0/node-v18.0.0-linux-x64.tar.xz
+tar -xf node-v18*
+rm -f /bin/node
+mv node-v18*/bin/node /bin/
+rm -f /bin/npm
+mv node-v18*/bin/npm /bin/
+
+
+dnf remove docker docker-latest docker-engine docker-client docker-common docker-client-latest docker-logrotate docker-latest-logrotate
+dnf config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo
+dnf install docker-ce --nobest --allowerasing -y
+systemctl enable docker
+systemctl start docker
+
+
+docker volume create portainer_data
+docker run -d -p 8000:8000 -p 9443:9443 --name portainer \
+    --restart=always \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    -v portainer_data:/data \
+    portainer/portainer-ce:2.9.3
+
+
+
+curl -L https://github.com/docker/compose/releases/download/$(curl -Ls https://www.servercow.de/docker-compose/latest.php)/docker-compose-$(uname -s)-$(uname -m) > /usr/local/bin/docker-compose
+chmod +x /usr/local/bin/docker-compose
+
+echo "alias docker-compose='/usr/local/bin/docker-compose'" >> /home/radmadical/.bashrc 
+echo "alias docker-compose='/usr/local/bin/docker-compose'" >> /root/.bashrc 
+alias docker-compose=/usr/local/bin/docker-compose
+source /home/radmadical/.bash_profile
+source /root/.bash_profile
+ln -s /usr/local/bin/docker-compose /usr/sbin/docker-compose
+
+cd /var/www
+git clone https://github.com/mailcow/mailcow-dockerized
+cd mailcow-dockerized
+./generate_config.sh
+
+#Press enter to confirm the detected value '[value]' where applicable or enter a custom value.
+#Mail server hostname (FQDN) - this is not your mail domain, but your mail servers hostname: radmadical.local.intra
+#Timezone [America/New_York]: America/Los_Angeles
+#Generating snake-oil certificate...
+
+echo "$(sed 's/^\s*HTTP_PORT\s*=.*$/HTTP_PORT=8050/gm' mailcow.conf)" > mailcow.conf.tmp
+rm -f mailcow.conf
+mv mailcow.conf.tmp mailcow.conf
+echo "$(sed 's/^\s*HTTPS_PORT\s*=.*$/HTTPS_PORT=4433/gm' mailcow.conf)" > mailcow.conf.tmp
+rm -f mailcow.conf
+mv mailcow.conf.tmp mailcow.conf
+
+docker-compose pull
+docker-compose up -d
+
+
+
+
+
+#### RANDOM EXTRAS -----------------vv
+
+dnf install https://download.sublimetext.com/sublime-text-3211-1.x86_64.rpm -y
+
+# LINK /var/www/html to nginx root for use of APACHE
+ln -s /var/www/nginx/html/ /var/www/html
+
+echo "$(sed 's/^\User\s.*$/User nginx/gm' /etc/httpd/conf/httpd.conf)" > /etc/httpd/conf/httpd.conf.tmp
+rm -f /etc/httpd/conf/httpd.conf
+mv /etc/httpd/conf/httpd.conf.tmp /etc/httpd/conf/httpd.conf
+
+echo "$(sed 's/^\Group\s.*$/Group nginx/gm' /etc/httpd/conf/httpd.conf)" > /etc/httpd/conf/httpd.conf.tmp
+rm -f /etc/httpd/conf/httpd.conf
+mv /etc/httpd/conf/httpd.conf.tmp /etc/httpd/conf/httpd.conf
+
+
+dnf install gnome-tweaks -y
+
+dnf install blivet-gui -y
+
+dnf install playonlinux -y
+
+dnf install q4wine -y
+
+dnf install pavucontrol -y
+
+dnf install daemonize -y
+
+
+(echo "[Webmin]
+name=Webmin Distribution Neutral
+baseurl=http://download.webmin.com/download/yum
+enabled=1
+gpgcheck=1
+gpgkey=http://www.webmin.com/jcameron-key.asc" >/etc/yum.repos.d/webmin.repo;
+dnf -y install webmin)
+
+
+
+dnf install git libuuid-devel autoconf automake pkgconfig zlib-devel curl findutils libmnl gcc make -y
+cd /var/www/
+git clone https://github.com/netdata/netdata.git --depth=100 --recursive
+./packaging/installer/install-required-packages.sh --non-interactive --dont-wait netdata
+./netdata-installer.sh
+systemctl enable netdata
+systemctl start netdata
+
+
+
+curl https://packages.ntop.org/centos/ntop.repo > /etc/yum.repos.d/ntop.repo
+dnf config-manager --set-enabled PowerTools
+yum clean all
+yum update -y
+dnf clean all
+dnf update -y
+dnf install pfring-dkms n2disk nprobe ntopng cento pfring-drivers-zc-dkms -y
+systemctl enable ntopng
+systemctl start ntopng
+
+
+
+cd /var/www/
+mkdir node_modules
+#chown nginx:nginx node_modules
+#sudo -u nginx npm install npm-gui
+#sudo -u nginx node /var/www/node_modules/npm-gui localhost:8147
+npm install npm-gui
+node /var/www/node_modules/npm-gui localhost:8147
+
+
+
+
+cd /var/www/
+#######
+#git clone https://github.com/tagspaces/tagspaces.git #--recursive
+#chown -R nginx:nginx tagspaces
+#cd tagspaces
+
+#git reset --hard dc44e66ce08aaf26406e640acf02d10384ab8760
+#git pull
+#git reset --hard 46c888c45d48a3926082a8892c0e73c1340eda50
+#echo 'KEY=as8f0jsdfajsdfoi' >> app/.env
+
+#chown -R nginx:nginx ../tagspaces
+
+#git checkout master
+#npm install -g rimraf
+#sudo -u nginx yarn install
+#sudo -u nginx yarn install-ext
+
+#sudo -u nginx npm install
+#chown -R nginx:nginx ../tagspaces
+
+#sudo -u nginx npm cache clean --force
+#rm -rf node_modules/
+#sudo -u nginx npm install
+#chown -R nginx:nginx ../tagspaces
+#sudo -u nginx npm start
+######
+
+mkdir /var/www/nginx/alltags
+
+wget https://alltags.net/releases/allTags%20Server%200.9%20linux%2064bit.tar.gz
+mv allTags* /var/www/nginx/alltags
+cd /var/www/nginx/alltags
+tar -xzf allTags*
+rm -f allTags*.tar.gz
+mkdir data/keys
+chmod 777 data/keys
+
+cp -fp templates/config.json .
+
+#vim config.json
+#
+#{
+#        "database":{
+#                "host":"localhost",
+#                "port":3306,
+#                "name":"alltags",
+#                "user":"root",
+#                "pass":"_Cupsies17"
+#        },
+#        "paths":{
+#                "expansionKeys":"data/keys",
+#                "files":"/var/www/nginx/html",
+#                "temp":"data/temp",
+#                "thumbnails":"data/thumbnails"
+#        },
+#        "webServer":{
+#                "cert":"cert.crt",
+#                "hostname":"radmadical.local.intra",
+#                "key":"cert.key",
+#                "port":55501,
+#                "selfSigned":true
+#        }
+#}
+#
+
+chown -R nginx:nginx /var/www/nginx
+
+#? Please select an action. 3: Create new admin user for initial or emergency access
+#? Please enter a first name: radmadical
+#? Please enter a surname: hatter
+#? Please enter a client name localhost
+#? Admin user created successfully. This connection string is valid for 1 day:
+#eyJmaW5nZXJwcmludCI6IjcwMmU3NDhmY2U1ZTVlYzQxYTIyNjFhNzQ0MWE0NmY5YzAzNzQwNmIwNjliNzkwYWJhZWY5YTEzODY2Njk2YzgiLCJzZWxmU2lnbmVkIjp0cnVlLCJ0b2tlbiI6Im1sQVVoU0ZxWEZ5UmZHTmMiLCJ1dWlkIjoiZmZlOTgxMTUtZDIxOC00YmJkLWE4ZDMtOTExZTNlZGNiZmE4IiwidXJsIjoiaW50cmEucmFkbWFkaWNhbC5sb2NhbGhvc3Q6NTU1MDEifQ==
+
+
+
+
+
+dnf install https://prerelease.keybase.io/keybase_amd64.rpm -y
+sudo -u $(echo $CURRENT_INSTALL_USER_NM) run_keybase
+
+
+
+
+#### BEGIN DEVELOPMENT -----------------vv
+
+
+sudo -u nginx git clone https://github.com/mjhd/min.htmlpage.clone.git /var/www/nginx/html/
+sudo -u nginx git clone https://github.com/mudmin/UserSpice5.git /var/www/nginx/html/userspice
+
+mysql -p
+create database userspice;
+GRANT ALL PRIVILEGES ON * . * TO 'root'@'localhost';
+
+# -------- DO INSTALL IN BROWSER AT: localhost
+
+echo 'require_once $abs_us_root.$us_url_root."users/includes/loader.php";' >> /var/www/nginx/html/userspice/users/init.php
+
+# ----- Plugin DIR: userspice/usersc/plugins/
+
